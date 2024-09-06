@@ -36,6 +36,8 @@ jobs:
         run: |
           echo "The version hasn't changed. Cancelling workflow..."
           node -e "require('@actions/core').cancel('Cancelling the workflow because version did not change.')"
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
       - name: Create GitHub Release
         id: create_release
