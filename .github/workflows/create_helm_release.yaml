@@ -26,6 +26,7 @@ jobs:
           version=$(yq e '.version' ./test-chart/Chart.yaml)
           echo "version=v$version" >> $GITHUB_ENV
           echo "version=v$version" >> $GITHUB_OUTPUT
+          echo "Chart version: v$version"
 
       - name: Get latest Git tag
         id: get_latest_tag
@@ -33,6 +34,7 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "Latest tag: $latest_tag"
 
       - name: Create GitHub Release
         if: ${{ env.latest_tag != env.version }}
