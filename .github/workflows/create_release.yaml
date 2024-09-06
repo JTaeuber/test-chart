@@ -20,16 +20,16 @@ jobs:
         id: chart_version
         run: |
           version=$(yq e '.version' ./test-chart/Chart.yaml)
-          echo "::set-output name=version::v$version"
+          echo "version=v$version" >> $GITHUB_OUTPUT
 
       - name: Get latest Git tag
         id: get_latest_tag
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
-          echo "::set-output name=tag::$tag"
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        if: steps.get_latest_tag.outputs.tag != steps.chart_version.outputs.version
+        if: steps.get_latest_tag.outputs.latest_tag != steps.chart_version.outputs.version
         id: create_release
         uses: ncipollo/release-action@v1
         with:
