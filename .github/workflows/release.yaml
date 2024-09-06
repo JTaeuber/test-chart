@@ -1,0 +1,38 @@
+name: Create Release
+
+on:
+  push:
+    paths:
+      - ./test-chart/Chart.yaml
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract Chart Version
+        id: chart_version
+        run: |
+          version=$(yq e '.version' ./test-chart/Chart.yaml)
+          echo "::set-output name=version::v$version"
+
+      - name: Get latest Git tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "::set-output name=tag::$tag"
+
+      - name: Create GitHub Release
+        if: steps.get_latest_tag.outputs.tag != steps.chart_version.outputs.version
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.chart_version.outputs.version }}
+          name: ${{ steps.chart_version.outputs.version }}
+          generateReleaseNotes: true
