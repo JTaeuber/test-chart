@@ -44,8 +44,8 @@ jobs:
       - name: Extract Chart Version
         id: chart_version
         run: |
-          version=$(yq e '.version' ./chart/Chart.yaml)
-          echo "::set-output name=version::$version"
+          version=$(yq e '.version' ./test-chart/Chart.yaml)
+          echo "version=v$version" >> $GITHUB_OUTPUT
 
       - name: Dispatch Event to Helm-Charts Repo
         uses: peter-evans/repository-dispatch@v3
