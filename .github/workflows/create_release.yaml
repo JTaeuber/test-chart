@@ -30,24 +30,17 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
 
+      - name: End Workflow if version didn't change
+        if: steps.get_latest_tag.outputs.latest_tag == steps.chart_version.outputs.version
+        id: end_workflow
+        run: |
+          echo "The version hasn't changed. Cancelling workflow..."
+          node -e "require('@actions/core').cancel('Cancelling the workflow because version did not change.')"
+
       - name: Create GitHub Release
-        if: steps.get_latest_tag.outputs.latest_tag != steps.chart_version.outputs.version
         id: create_release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.chart_version.outputs.version }}
           name: ${{ steps.chart_version.outputs.version }}
           generateReleaseNotes: true
-
-      - name: Set tag flag
-        if: steps.get_latest_tag.outputs.latest_tag != steps.chart_version.outputs.version
-        id: tag_flag
-        run: |
-          echo flag=true > tag_flag.txt
-        shell: bash
-
-      - name: Upload execution status as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: tag_flag
-          path: tag_flag.txt
