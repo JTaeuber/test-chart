@@ -37,8 +37,8 @@ jobs:
         id: create_tag
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.chart_version.outputs.version }}
-          name: ${{ steps.chart_version.outputs.version }}
+          tag: v${{ steps.chart_version.outputs.version }}
+          name: v${{ steps.chart_version.outputs.version }}
           generateReleaseNotes: true
 
   push_chart:
