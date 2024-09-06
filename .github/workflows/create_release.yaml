@@ -2,8 +2,6 @@ name: Create Release
 
 on:
   push:
-    paths:
-      - test-chart/Chart.yaml
 
 jobs:
   release:
