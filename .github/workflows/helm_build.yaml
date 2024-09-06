@@ -28,7 +28,7 @@ jobs:
 
       - name: Helm Lint, Package, and Push
         run: |
-          cd chart
+          cd test-chart
           helm lint .
           helm package .
           helm push $(ls *.tgz | head -1) oci://ghcr.io/jtaeuber/charts
