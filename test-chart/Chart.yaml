@@ -6,7 +6,3 @@ keywords:
   - testing
 version: 11.0.0
 appVersion: 11.0.0
-maintainers:
-  - name: JTaeuber
-    email: jan.taeuber@telekom.de
-    url: https://www.telekom.com
