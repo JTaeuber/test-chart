@@ -1,15 +1,51 @@
-name: Build and Push Helm Package
+name: Create a release and build and push Helm Chart
 
 on:
-  workflow_run:
-    workflows: ["Create Release"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Extract Chart Version
+        id: chart_version
+        run: |
+          version=$(yq e '.version' ./test-chart/Chart.yaml)
+          echo "version=v$version" >> $GITHUB_OUTPUT
+
+      - name: Get latest Git tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: End Workflow if version didn't change
+        if: steps.get_latest_tag.outputs.latest_tag == steps.chart_version.outputs.version
+        id: end_workflow
+        run: |
+          echo "The version hasn't changed. Cancelling workflow..."
+          exit 0
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.chart_version.outputs.version }}
+          name: ${{ steps.chart_version.outputs.version }}
+          generateReleaseNotes: true
+
   push_chart:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -38,12 +74,6 @@ jobs:
         env:
           MTR: mtr.devops.telekom.de
           REPO: ${{secrets.REPO}}
-
-      - name: Extract Chart Version
-        id: chart_version
-        run: |
-          version=$(yq e '.version' ./test-chart/Chart.yaml)
-          echo "version=v$version" >> $GITHUB_OUTPUT
 
       - name: Dispatch Event to Helm-Charts Repo
         uses: peter-evans/repository-dispatch@v3
