@@ -2,13 +2,30 @@ name: Build and Push Helm Package
 
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 jobs:
   helm:
     runs-on: ubuntu-latest
     steps:
+      - name: Download the tag_flag artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: tag_flag
+          path: ./status
+
+      - name: Check if flag is set
+        id: check_flag
+        run: |
+          status=$(cat ./status/tag_flag.txt | grep "flag=true")
+          if [ -z "$status" ]; then
+            echo "The flag is not set."
+            exit 0
+          else
+            echo "The flag is set. Building helm chart."
+          fi
+
       - name: Checkout Repo
         uses: actions/checkout@v4
 

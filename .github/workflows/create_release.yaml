@@ -38,3 +38,16 @@ jobs:
           tag: ${{ steps.chart_version.outputs.version }}
           name: ${{ steps.chart_version.outputs.version }}
           generateReleaseNotes: true
+
+      - name: Set tag flag
+        if: steps.get_latest_tag.outputs.latest_tag != steps.chart_version.outputs.version
+        id: tag_flag
+        run: |
+          echo flag=true > tag_flag.txt
+        shell: bash
+
+      - name: Upload execution status as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tag_flag
+          path: tag_flag.txt
