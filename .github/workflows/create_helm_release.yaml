@@ -78,6 +78,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          repository: jtaeuber/helm-charts
+          repository: JTaeuber/helm-charts
           event-type: new-helm-chart-version
           client-payload: '{"chart": "test-chart", "version": "${{ needs.create_release.outputs.version }}"}'
