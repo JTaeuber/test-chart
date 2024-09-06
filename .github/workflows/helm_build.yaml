@@ -1,10 +1,6 @@
 name: Build and Push Helm Package
 
 on:
-  workflow_run:
-    workflows: ["Create Release"]
-    types:
-      - completed
   push:
     tags:
       - "*"
