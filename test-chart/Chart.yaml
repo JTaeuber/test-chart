@@ -4,9 +4,5 @@ description: A Helm chart for testing purposes in Kubernetes
 type: application
 keywords:
   - testing
-version: 2.0.0
-appVersion: 2.0.0
-maintainers:
-  - name: JTaeuber
-    email: jan.taeuber@telekom.de
-    url: https://www.telekom.com
+version: 1.0.0
+appVersion: 1.0.0
