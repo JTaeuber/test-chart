@@ -29,14 +29,8 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
 
-      - name: End Workflow if version didn't change
-        if: steps.get_latest_tag.outputs.latest_tag == steps.chart_version.outputs.version
-        id: end_workflow
-        run: |
-          echo "The version hasn't changed. Cancelling workflow..."
-          exit 0
-
       - name: Create GitHub Release
+        if: steps.get_latest_tag.outputs.latest_tag != steps.chart_version.outputs.version
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -46,6 +40,8 @@ jobs:
 
   push_chart:
     runs-on: ubuntu-latest
+    needs: create_release
+    if: ${{ needs.create_release.outputs.latest_tag != needs.create_release.outputs.version }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
