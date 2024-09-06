@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      latest_tag: ${{ steps.get_latest_tag.outputs.latest_tag }}
+      version: ${{ steps.chart_version.outputs.version }}
 
     steps:
       - name: Checkout code
@@ -22,12 +25,14 @@ jobs:
         run: |
           version=$(yq e '.version' ./test-chart/Chart.yaml)
           echo "version=v$version" >> $GITHUB_ENV
+          echo "::set-output name=version::v$version"
 
       - name: Get latest Git tag
         id: get_latest_tag
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          echo "::set-output name=latest_tag::$latest_tag"
 
       - name: Create GitHub Release
         if: ${{ env.latest_tag != env.version }}
