@@ -4,6 +4,6 @@ description: A Helm chart for testing purposes in Kubernetes
 
 type: application
 
-version: 5.0.0
+version: 6.0.0
 
-appVersion: 5.0.0
+appVersion: 6.0.0
