@@ -1,9 +1,10 @@
 name: Test Workflow
 
 on:
-  release:
+  workflow_run:
+    workflows: ["Create a release and build and push Helm Chart"]
     types:
-      - created
+      - completed
 
 jobs:
   job:
