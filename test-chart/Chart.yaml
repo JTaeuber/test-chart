@@ -4,5 +4,5 @@ description: A Helm chart for testing purposes in Kubernetes
 type: application
 keywords:
   - testing
-version: 8.0.0
-appVersion: 8.0.0
+version: 9.0.0
+appVersion: 9.0.0
