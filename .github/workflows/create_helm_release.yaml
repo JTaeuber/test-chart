@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - ./test-chart/Chart.yaml
+      - test-chart/Chart.yaml
 
 jobs:
   create_release:
