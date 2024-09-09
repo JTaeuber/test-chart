@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - ./test-chart/Chart.yaml
 
 jobs:
   create_release:
