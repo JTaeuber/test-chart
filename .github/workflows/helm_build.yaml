@@ -1,0 +1,45 @@
+name: Build and push helm chart
+
+on:
+  repository_dispatch:
+    types: [new-version]
+
+jobs:
+  push_chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm version
+
+      - name: Log in to Helm OCI Registry
+        run: |
+          helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          helm registry login ${MTR} -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+          env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          MTR: mtr.devops.telekom.de
+
+      - name: Helm Lint, Package, and Push
+        run: |
+          cd test-chart
+          helm lint .
+          helm package .
+          helm push $(ls *.tgz | head -1) oci://ghcr.io/jtaeuber/charts
+          helm push $(ls *.tgz | head -1) oci://${MTR}/${REPO}/charts
+          env:
+          MTR: mtr.devops.telekom.de
+          REPO: ${{ secrets.REPO }}
+
+      - name: Dispatch Event to Helm-Charts Repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: JTaeuber/helm-charts
+          event-type: new-helm-chart-version
+          client-payload: '{"chart": "test-chart", "version": "${{ github.event.client_payload.version }}"}'

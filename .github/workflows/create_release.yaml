@@ -1,0 +1,20 @@
+name: Create new release
+
+on:
+  repository_dispatch:
+    types: [new-version]
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ github.event.client_payload.version }}
+          name: v${{ github.event.client_payload.version }}
+          generateReleaseNotes: true
