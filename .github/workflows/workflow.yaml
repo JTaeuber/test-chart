@@ -1,17 +1,33 @@
 name: Test Workflow
 
 on:
-  workflow_run:
-    workflows: ["Create a release and build and push Helm Chart"]
-    types:
-      - completed
+  push:
 
 jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get the Git Tag
-        run: 'echo "Git tag: ${GITHUB_REF##*/}"'
+      - name: Check Version Format in Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: nowsprinting/check-version-format-action@v4.0.2
+        id: check-version
+        with:
+          prefix: "v"
+
+      - name: Set tag
+        id: set-tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TAG1="dev"
+          TAG2="commit-$SHORT_SHA"
+
+          if [[ "${{ steps.check-version.outputs.is_valid }}" == 'true' ]]; then
+            TAG1="latest"
+            TAG2="${{ steps.check-version.outputs.full_without_prefix }}"
+          fi
+
+          echo "$TAG1"
+          echo "$TAG2"
