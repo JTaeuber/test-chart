@@ -42,7 +42,6 @@ jobs:
           tag: v${{ steps.chart_version.outputs.version }}
           name: v${{ steps.chart_version.outputs.version }}
           generateReleaseNotes: true
-          token: ${{ secrets.ACCESS_TOKEN }}
 
   push_chart:
     runs-on: ubuntu-latest
