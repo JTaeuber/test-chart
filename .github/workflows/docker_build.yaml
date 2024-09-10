@@ -5,7 +5,7 @@ on:
     types: [new-version]
 
 jobs:
-  job:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: Set tag

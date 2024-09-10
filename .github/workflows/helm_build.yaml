@@ -5,7 +5,7 @@ on:
     types: [new-version]
 
 jobs:
-  push_chart:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -20,7 +20,7 @@ jobs:
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
           helm registry login ${MTR} -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-          env:
+        env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           MTR: mtr.devops.telekom.de
@@ -32,7 +32,7 @@ jobs:
           helm package .
           helm push $(ls *.tgz | head -1) oci://ghcr.io/jtaeuber/charts
           helm push $(ls *.tgz | head -1) oci://${MTR}/${REPO}/charts
-          env:
+        env:
           MTR: mtr.devops.telekom.de
           REPO: ${{ secrets.REPO }}
 

@@ -8,7 +8,7 @@ on:
       - test-chart/Chart.yaml
 
 jobs:
-  create_release:
+  check_version:
     runs-on: ubuntu-latest
     permissions:
       contents: write
