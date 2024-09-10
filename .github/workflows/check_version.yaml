@@ -32,10 +32,10 @@ jobs:
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
 
       - name: Dispatch Event to Helm-Charts Repo
-        if:
+        if: ${{ env.version }} != ${{ env.latest_tag}}
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: JTaeuber/test-chart
-          event-type: new-version
+          event-type: release-new-version
           client-payload: '{"version": "${{ env.version }}"}'

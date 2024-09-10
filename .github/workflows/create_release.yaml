@@ -2,7 +2,7 @@ name: Create new release
 
 on:
   repository_dispatch:
-    types: [new-version]
+    types: [release-new-version]
 
 jobs:
   create_release:
