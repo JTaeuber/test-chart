@@ -12,7 +12,7 @@ jobs:
         id: set-tag
         run: |
           TAG1="latest"
-          TAG2="${{ github.event.client_payload.version }}"
+          TAG2="${{ github.event.client_payload.appVersion }}"
 
           echo "$TAG1"
           echo "$TAG2"

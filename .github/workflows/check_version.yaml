@@ -8,16 +8,35 @@ on:
       - test-chart/Chart.yaml
 
 jobs:
-  check_version:
+  check_versions:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for appVersion change
+        id: check_for_appVersion_change
+        run: |
+          app_version_change=$(git diff main -- test-chart/Chart.yaml | grep -e "^[+-]appVersion: ")
+          echo "app_version_change=$app_version_change" >> $GITHUB_OUTPUT
+
+      - name: Check for version change
+        id: check_for_version_change
+        run: |
+          version_change=$(git diff main -- test-chart/Chart.yaml | grep -e "^[+-]version: ")
+          echo "version_change=$version_change" >> $GITHUB_OUTPUT
+
+  build_new_chart:
+    runs-on: ubuntu-latest
+    needs: check_versions
+    if: ${{ needs.check_versions.outputs.version_change }}
     permissions:
       contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Extract Chart Version
         id: chart_version
@@ -25,17 +44,35 @@ jobs:
           version=$(yq e '.version' ./test-chart/Chart.yaml)
           echo "version=$version" >> $GITHUB_ENV
 
-      - name: Get latest Git tag
-        id: get_latest_tag
+      - name: Dispatch Event to Helm-Charts Repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: JTaeuber/test-chart
+          event-type: build-new-chart
+          client-payload: '{"version": "${{ env.version }}"}'
+
+  release_new_version:
+    runs-on: ubuntu-latest
+    needs: check_versions
+    if: ${{ needs.check_versions.outputs.app_version_change }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract App Version
+        id: app_version
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 || echo "No tags found")
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          app_version=$(yq e '.appVersion' ./test-chart/Chart.yaml)
+          echo "app_version=$app_version" >> $GITHUB_ENV
 
       - name: Dispatch Event to Helm-Charts Repo
-        if: v${{ env.version }} != ${{ env.latest_tag}}
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: JTaeuber/test-chart
           event-type: release-new-version
-          client-payload: '{"version": "${{ env.version }}"}'
+          client-payload: '{"appVersion": "${{ env.app_version }}"}'
