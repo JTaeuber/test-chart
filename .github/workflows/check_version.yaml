@@ -32,8 +32,8 @@ jobs:
       - name: Debug version echo
         id: debug
         run: |
-          echo ${{ steps.check_for_appVersion_change.outputs.app_version_change }}
-          echo ${{ steps.check_for_version_change.outputs.version_change }}
+          echo "app_version_change=${{ steps.check_for_appVersion_change.outputs.app_version_change }}"
+          echo "version_change=${{ steps.check_for_version_change.outputs.version_change }}"
 
   build_new_chart:
     runs-on: ubuntu-latest
