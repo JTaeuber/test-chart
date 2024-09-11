@@ -29,10 +29,16 @@ jobs:
           version_change=$(git diff main HEAD~1 -- test-chart/Chart.yaml | grep -qe "^[+-]version: " || echo "version didn't change")
           echo "version_change=$version_change" >> $GITHUB_OUTPUT
 
+      - name: Debug version echo
+        id: debug
+        run: |
+          echo ${{ steps.check_for_appVersion_change.outputs.app_version_change }}
+          echo ${{ steps.check_for_version_change.outputs.version_change }}
+
   build_new_chart:
     runs-on: ubuntu-latest
     needs: check_versions
-    if: ${{ needs.check_versions.outputs.version_change == 'true' }}
+    if: ${{ needs.check_versions.outputs.version_change }}
     permissions:
       contents: write
 
@@ -57,7 +63,7 @@ jobs:
   release_new_version:
     runs-on: ubuntu-latest
     needs: check_versions
-    if: ${{ needs.check_versions.outputs.app_version_change == 'true' }}
+    if: ${{ needs.check_versions.outputs.app_version_change }}
     permissions:
       contents: write
 
