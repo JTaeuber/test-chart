@@ -18,19 +18,19 @@ jobs:
       - name: Check for appVersion change
         id: check_for_appVersion_change
         run: |
-          app_version_change=$(git diff main -- test-chart/Chart.yaml | grep -e "^[+-]appVersion: ")
+          app_version_change=$(git diff main HEAD~1 -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: " || echo "appVersion didn't change")
           echo "app_version_change=$app_version_change" >> $GITHUB_OUTPUT
 
       - name: Check for version change
         id: check_for_version_change
         run: |
-          version_change=$(git diff main -- test-chart/Chart.yaml | grep -e "^[+-]version: ")
+          version_change=$(git diff main HEAD~1 -- test-chart/Chart.yaml | grep -qe "^[+-]version: " || echo "version didn't change")
           echo "version_change=$version_change" >> $GITHUB_OUTPUT
 
   build_new_chart:
     runs-on: ubuntu-latest
     needs: check_versions
-    if: ${{ needs.check_versions.outputs.version_change }}
+    if: ${{ needs.check_versions.outputs.version_change == 'true' }}
     permissions:
       contents: write
 
@@ -55,7 +55,7 @@ jobs:
   release_new_version:
     runs-on: ubuntu-latest
     needs: check_versions
-    if: ${{ needs.check_versions.outputs.app_version_change }}
+    if: ${{ needs.check_versions.outputs.app_version_change == 'true' }}
     permissions:
       contents: write
 
