@@ -8,6 +8,39 @@ jobs:
   check_for_release:
     name: Check For Release
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for appVersion changes on creation
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') && github.event.action == 'opened' }}
+        run: |
+          echo "Checking for appVersion changes..."
+          if git diff origin/${{ github.base_ref }} -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
+            echo "appVersion has changed. Failing the job."
+            exit 1
+          else
+            echo "No appVersion changes detected."
+          fi
+
+      - name: Check for appVersion changes on update
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') && (github.event.action == 'synchronize' || github.event.action == 'labeled') }}
+        run: |
+          echo "Checking for appVersion changes..."
+          if git diff ${{ github.base_ref }} HEAD~1 -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
+            echo "appVersion has changed. Failing the job."
+            exit 1
+          else
+            echo "No appVersion changes detected."
+          fi
+
+  post_message:
+    name: Post message to warn of new release
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
     permissions:
       contents: write
       pull-requests: write
@@ -18,26 +51,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for appVersion changes
-        if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') }}
-        run: |
-          echo "Checking for appVersion changes..."
-          if git diff origin/${{ github.base_ref }} -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
-            echo "appVersion has changed. Failing the job."
-            exit 1
-          else
-            echo "No appVersion changes detected."
-          fi
-
       - name: Extract appVersion
-        if: ${{ failure() }}
         id: extract_appversion
         run: |
           appversion=$(yq e '.appVersion' ./test-chart/Chart.yaml)
           echo "appversion=$appversion" >> $GITHUB_ENV
 
       - name: Post warning comment
-        if: ${{ failure() }}
         uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
