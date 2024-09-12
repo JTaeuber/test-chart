@@ -30,7 +30,7 @@ jobs:
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') && (github.event.action == 'synchronize' || github.event.action == 'labeled') }}
         run: |
           echo "Checking for appVersion changes..."
-          if git diff ${{ github.base_ref }}...HEAD -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
+          if git diff ${{ github.ref_name }}...HEAD -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
             echo "appVersion has changed. Failing the job."
             exit 1
           else
