@@ -4,5 +4,6 @@ description: A Helm chart for testing purposes in Kubernetes
 type: application
 keywords:
   - testing
+  - helm-chart
 version: 1.0.5
 appVersion: 1.0.5
