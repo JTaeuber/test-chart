@@ -41,6 +41,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug Labels
+        run: |
+          echo "Labels: ${{ toJson(github.event.pull_request.labels) }}"
+
       - name: Extract appVersion
         id: extract_appversion
         run: |
