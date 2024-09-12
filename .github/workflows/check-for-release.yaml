@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for appVersion changes on creation
+      - name: Check for appVersion changes
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'new release') }}
         run: |
           echo "Checking for appVersion changes..."
@@ -40,10 +40,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Debug Labels
-        run: |
-          echo "Labels: ${{ toJson(github.event.pull_request.labels) }}"
 
       - name: Extract appVersion
         id: extract_appversion
