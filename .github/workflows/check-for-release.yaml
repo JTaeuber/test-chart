@@ -16,11 +16,27 @@ jobs:
           fetch-depth: 0
 
       - name: Check for appVersion changes
-        if: ${{ !contains(github.event.pull_request.labels.*.name, 'new release') }}
         run: |
           echo "Checking for appVersion changes..."
           if git diff origin/${{ github.base_ref }} -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
-            echo "appVersion has changed. Failing the job."
+            app_version_change=$(echo "version changed")
+            echo "app_version_change=$app_version_change" >> $GITHUB_ENV
+          else
+            app_version_change=$(echo "No appVersion changes detected.")
+            echo "app_version_change=$app_version_change" >> $GITHUB_ENV
+          fi
+
+      - name: Remove new version label
+        if: ${{ env.app_version_change }} == 'No appVersion changes detected.'
+        run: |
+          echo "No appVersion changes detected. Removing new version label"
+          gh pr edit ${{ github.event.pull_request.number }} --remove-label "new version"
+
+      - name: Fail if changes occured
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'new release') }}
+        run: |
+          if ${{ env.app_version_change }} == 'version changed'
+            echo "Version changed, exiting..."
             exit 1
           else
             echo "No appVersion changes detected."
