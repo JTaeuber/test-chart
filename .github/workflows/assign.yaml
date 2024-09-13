@@ -10,8 +10,8 @@ jobs:
   assign-creator:
     runs-on: ubuntu-latest
     steps:
-      - name: Assign Issue/PR creator
-        uses: actions-assign/assign@v2
+      - name: Auto-assign the creator
+        uses: kentaro-m/auto-assign-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           assignees: ${{ github.actor }}
