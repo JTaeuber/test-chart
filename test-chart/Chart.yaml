@@ -5,5 +5,5 @@ type: application
 keywords:
   - testing
   - helm-chart
-version: 1.0.9
-appVersion: 1.0.9
+version: 1.0.8
+appVersion: 1.0.8
