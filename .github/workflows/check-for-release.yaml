@@ -37,7 +37,7 @@ jobs:
       - name: Fail if changes occured
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'new release') }}
         run: |
-          if ${{ env.app_version_change }} == 'version changed'; then
+          if '${{ env.app_version_change }}' == 'version changed'; then
             echo "Version changed, exiting..."
             exit 1
           else
