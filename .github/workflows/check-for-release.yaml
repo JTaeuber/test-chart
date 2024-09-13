@@ -31,6 +31,8 @@ jobs:
         run: |
           echo "No appVersion changes detected. Removing new version label"
           gh pr edit ${{ github.event.pull_request.number }} --remove-label "new version"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fail if changes occured
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'new release') }}
