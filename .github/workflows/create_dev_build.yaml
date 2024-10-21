@@ -10,10 +10,19 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract Chart Version
+        id: chart_version
+        run: |
+          version=$(yq e '.version' ./test-chart/Chart.yaml)
+          echo "version=$version" >> $GITHUB_ENV
+
       - name: Dispatch event to create dev build
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: JTaeuber/test-chart
           event-type: create-dev-build
-          client-payload: '{"version": "dev"}'
+          client-payload: '{"version": "${{ env.version }}-dev"}'
