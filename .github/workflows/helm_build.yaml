@@ -2,7 +2,7 @@ name: Build and push helm chart
 
 on:
   repository_dispatch:
-    types: [build-new-chart]
+    types: [release-new-version, create-dev-build]
 
 jobs:
   build_and_push:
