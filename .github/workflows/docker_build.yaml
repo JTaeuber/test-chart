@@ -2,26 +2,17 @@ name: Build and push docker image
 
 on:
   repository_dispatch:
-    types: [release-new-version, create-dev-build]
+    types: [release-new-version]
 
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
-      - name: Set tags
-        id: set-tags
-        if: github.event.action == 'release-new-version'
+      - name: Set tag
+        id: set-tag
         run: |
           TAG1="latest"
           TAG2="${{ github.event.client_payload.appVersion }}"
 
           echo "$TAG1"
           echo "$TAG2"
-
-      - name: Set dev tag
-        id: set-dev-tag
-        if: github.event.action == 'create-dev-build'
-        run: |
-          TAG="dev"
-
-          echo "$TAG"
