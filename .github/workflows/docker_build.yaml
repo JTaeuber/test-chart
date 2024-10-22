@@ -15,7 +15,7 @@ jobs:
           images: |
             ghcr.io/JTaeuber/test-chart
           tags: |
-            ${{ github.event.client_payload.setLatest && 'latest' }}
+            ${{ github.event.client_payload.setLatest && 'latest' || '' }}
             ${{ github.event.client_payload.appVersion }}
 
       - name: Echo tags
