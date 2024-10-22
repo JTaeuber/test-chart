@@ -10,7 +10,6 @@ jobs:
     steps:
       - name: Docker meta
         id: meta
-        if: github.event.action == 'release-new-version'
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -21,6 +20,5 @@ jobs:
 
       - name: Echo tags
         id: echo-tags
-        if: github.event.action == 'release-new-version'
         run: |
           echo ${{ steps.meta.outputs.tags }}
