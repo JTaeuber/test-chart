@@ -13,6 +13,8 @@ jobs:
     outputs:
       version_change: ${{ steps.check_for_version_change.outputs.version_change }}
       app_version_change: ${{ steps.check_for_appVersion_change.outputs.app_version_change }}
+      version: ${{ steps.chart_version.outputs.version }}
+      app_version: ${{ steps.app_version.outputs.app_version }}
 
     steps:
       - name: Checkout code
@@ -32,11 +34,25 @@ jobs:
           version_change=$(git diff main HEAD~1 -- test-chart/Chart.yaml | grep -qe "^[+-]version: " && echo "version changed" || echo "version didn't change")
           echo "version_change=$version_change" >> $GITHUB_OUTPUT
 
+      - name: Extract Chart Version
+        id: chart_version
+        run: |
+          version=$(yq e '.version' ./test-chart/Chart.yaml)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Extract App Version
+        id: app_version
+        run: |
+          app_version=$(yq e '.appVersion' ./test-chart/Chart.yaml)
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
+
       - name: Debug version echo
         id: debug
         run: |
           echo "app_version_change=${{ steps.check_for_appVersion_change.outputs.app_version_change }}"
           echo "version_change=${{ steps.check_for_version_change.outputs.version_change }}"
+          echo "version=${{ steps.chart_version.outputs.version }}"
+          echo "appVersion=${{ steps.app_version.outputs.app_version }}"
 
   build_new_chart:
     runs-on: ubuntu-latest
@@ -46,22 +62,13 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract Chart Version
-        id: chart_version
-        run: |
-          version=$(yq e '.version' ./test-chart/Chart.yaml)
-          echo "version=$version" >> $GITHUB_ENV
-
       - name: Dispatch event to build new helm chart
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: JTaeuber/test-chart
           event-type: build-new-chart
-          client-payload: '{"version": "${{ env.version }}"}'
+          client-payload: '{"version": "${{ needs.check_versions.outputs.version }}", "appVersion": "${{ needs.check_versions.outputs.app_version }}"}'
 
   release_new_version:
     runs-on: ubuntu-latest
@@ -71,19 +78,10 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract App Version
-        id: app_version
-        run: |
-          app_version=$(yq e '.appVersion' ./test-chart/Chart.yaml)
-          echo "app_version=$app_version" >> $GITHUB_ENV
-
       - name: Dispatch event to release new version
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: JTaeuber/test-chart
           event-type: release-new-version
-          client-payload: '{"appVersion": "${{ env.app_version }}"}'
+          client-payload: '{"appVersion": "${{ needs.check_versions.outputs.app_version }}", "setLatest": true}'
