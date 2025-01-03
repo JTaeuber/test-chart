@@ -17,6 +17,7 @@ jobs:
 
       - name: Check for appVersion changes
         run: |
+          echo "Applying hax"
           echo "Checking for appVersion changes..."
           if git diff origin/${{ github.base_ref }} -- test-chart/Chart.yaml | grep -qe "^[+-]appVersion: "; then
             app_version_change=$(echo "version changed")
