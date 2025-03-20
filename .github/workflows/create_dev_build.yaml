@@ -25,6 +25,7 @@ jobs:
     with:
       appVersion: "dev"
       setLatest: false
+    secrets: inherit
 
   helm_build:
     needs: create_dev_build
@@ -32,8 +33,4 @@ jobs:
     with:
       version: "${{ needs.create_dev_build.outputs.version }}-dev"
       appVersion: "dev"
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      REPO: ${{ secrets.REPO }}
-      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    secrets: inherit
