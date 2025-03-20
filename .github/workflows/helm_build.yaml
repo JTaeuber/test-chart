@@ -9,6 +9,15 @@ on:
       appVersion:
         required: true
         type: string
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+      REPO:
+        required: true
+      PERSONAL_ACCESS_TOKEN:
+        required: true
 
 jobs:
   build_and_push:
