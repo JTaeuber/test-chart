@@ -1,8 +1,14 @@
 name: Build and push docker image
 
 on:
-  repository_dispatch:
-    types: [release-new-version, create-dev-build]
+  workflow_call:
+    inputs:
+      appVersion:
+        required: true
+        type: string
+      setLatest:
+        required: true
+        type: boolean
 
 jobs:
   build_and_push:
@@ -15,8 +21,8 @@ jobs:
           images: |
             ghcr.io/JTaeuber/test-chart
           tags: |
-            ${{ github.event.client_payload.setLatest && 'latest' || '' }}
-            ${{ github.event.client_payload.appVersion }}
+            ${{ inputs.setLatest && 'latest' || '' }}
+            ${{ inputs.appVersion }}
 
       - name: Echo tags
         id: echo-tags
