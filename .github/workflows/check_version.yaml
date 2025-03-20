@@ -65,11 +65,7 @@ jobs:
     with:
       version: ${{ needs.check_versions.outputs.version }}
       appVersion: ${{ needs.check_versions.outputs.app_version }}
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      REPO: ${{ secrets.REPO }}
-      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    secrets: inherit
 
   build_new_image:
     needs: check_versions
@@ -82,6 +78,7 @@ jobs:
     with:
       appVersion: ${{ needs.check_versions.outputs.app_version }}
       setLatest: true
+    secrets: inherit
 
   release_new_version:
     needs: check_versions
@@ -92,3 +89,4 @@ jobs:
     uses: ./.github/workflows/create_release.yaml
     with:
       appVersion: ${{ needs.check_versions.outputs.app_version }}
+    secrets: inherit
