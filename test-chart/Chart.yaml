@@ -6,4 +6,4 @@ keywords:
   - testing
   - helm-chart
 version: 2.0.0
-appVersion: 2.0.0
+appVersion: 2.0.1
