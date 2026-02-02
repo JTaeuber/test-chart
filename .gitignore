@@ -1,2 +1,4 @@
 .env
 .vscode
+cosign.key
+cosign.pub

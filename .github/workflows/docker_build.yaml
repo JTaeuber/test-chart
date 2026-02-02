@@ -70,7 +70,7 @@ jobs:
         id: build-push-app2
         with:
           context: .
-          file: ./build/admissioncontroller/Dockerfile
+          file: ./build/app2/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta-app2.outputs.tags }}
