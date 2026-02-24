@@ -1,15 +1,15 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"time"
 )
 
 func main() {
-	counter := 1
+	var counter int
 
 	for {
-		log.Printf("test %d", counter)
+		slog.Info("counting up", "count", counter)
 		counter++
 		time.Sleep(1 * time.Second)
 	}
